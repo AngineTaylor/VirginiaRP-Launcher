@@ -1,6 +1,7 @@
 using Launcher.WPF.Services;
 using Launcher.WPF.ViewModels;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Input;
 
 namespace Launcher.WPF.Views
@@ -52,11 +53,23 @@ namespace Launcher.WPF.Views
             DataContext = new MainViewModel(service);
         }
 
-        private void DragArea_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        // Обработчик перетаскивания для заголовка
+        private void HeaderArea_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             if (e.ChangedButton == MouseButton.Left)
             {
                 DragMove();
+                e.Handled = true; // Помечаем событие как обработанное
+            }
+        }
+
+        // Обработчик для основной области (запасной)
+        private void DragArea_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            if (e.ChangedButton == MouseButton.Left && e.OriginalSource is Border)
+            {
+                DragMove();
+                e.Handled = true; // Помечаем событие как обработанное
             }
         }
     }
