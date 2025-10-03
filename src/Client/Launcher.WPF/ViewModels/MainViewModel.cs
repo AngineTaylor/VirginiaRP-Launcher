@@ -149,19 +149,30 @@ namespace Launcher.WPF.ViewModels
         {
             if (!CanCreateCharacter) return;
 
-            var selWindow = new CharacterSelectionWindow { Owner = Application.Current.MainWindow };
-            if (selWindow.ShowDialog() != true) return;
+            var selectionWindow = new CharacterSelectionWindow { Owner = Application.Current.MainWindow };
 
-            if (selWindow.DataContext is CharacterSelectionViewModel viewModel)
+            // Ждем, пока пользователь выберет тип персонажа
+            if (selectionWindow.ShowDialog() == true)
             {
-                var nickWindow = new NicknameWindow
-                {
-                    Owner = Application.Current.MainWindow,
-                    DataContext = new NicknameViewModel(_service, CurrentUser.SessionId, viewModel.SelectedCharacterKey)
-                };
+                // Получаем выбранный тип персонажа
+                var selectedCharacterType = selectionWindow.SelectedCharacterKey;
 
-                if (nickWindow.ShowDialog() == true)
-                    _ = RefreshAllAsync();
+                if (!string.IsNullOrEmpty(selectedCharacterType))
+                {
+                    // Создаем окно ввода имени с передачей выбранного типа персонажа
+                    var nicknameWindow = new NicknameWindow
+                    {
+                        Owner = Application.Current.MainWindow,
+                        DataContext = new NicknameViewModel(_service, CurrentUser.SessionId, selectedCharacterType)
+                    };
+
+                    // Показываем окно ввода имени и ждем результат
+                    if (nicknameWindow.ShowDialog() == true)
+                    {
+                        // Обновляем список персонажей после успешного создания
+                        _ = RefreshAllAsync();
+                    }
+                }
             }
         }
 

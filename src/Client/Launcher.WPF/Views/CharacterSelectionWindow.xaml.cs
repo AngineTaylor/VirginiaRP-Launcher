@@ -5,7 +5,7 @@ namespace Launcher.WPF.Views
 {
     public partial class CharacterSelectionWindow : Window
     {
-        public string SelectedCharacter => (DataContext as CharacterSelectionViewModel)?.SelectedCharacterKey;
+        public string SelectedCharacterKey => (DataContext as CharacterSelectionViewModel)?.SelectedCharacterKey;
 
         public CharacterSelectionWindow()
         {

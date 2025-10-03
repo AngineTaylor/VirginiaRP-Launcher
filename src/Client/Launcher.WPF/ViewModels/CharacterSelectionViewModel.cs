@@ -26,13 +26,22 @@ namespace Launcher.WPF.ViewModels
         private void SelectCharacter(string key)
         {
             SelectedCharacterKey = key;
-            CloseWindow(true);
+            CloseWindow(true); // Передаем true - пользователь сделал выбор
         }
 
         private void CloseWindow(bool dialogResult)
         {
-            var window = Application.Current.Windows.OfType<Window>().FirstOrDefault(w => w.DataContext == this);
-            window?.Close();
+            Application.Current.Dispatcher.Invoke(() =>
+            {
+                var window = Application.Current.Windows.OfType<Window>()
+                    .FirstOrDefault(w => w.DataContext == this);
+
+                if (window != null)
+                {
+                    window.DialogResult = dialogResult;
+                    window.Close();
+                }
+            });
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
