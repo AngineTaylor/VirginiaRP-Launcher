@@ -1,0 +1,47 @@
+﻿<Window x:Class="Launcher.WPF.Views.SettingsWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Настройки лаунчера" 
+        Height="450" Width="500"
+        WindowStartupLocation="CenterOwner"
+        ResizeMode="NoResize"
+        Background="#0F0F23">
+    <Grid Margin="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        <TextBlock Grid.Row="0" Text="⚙️ НАСТРОЙКИ ЛАУНЧЕРА" 
+                   FontSize="16" FontWeight="Bold" Foreground="White" 
+                   HorizontalAlignment="Center" Margin="0,0,0,20"/>
+        <StackPanel Grid.Row="1">
+            <TextBlock Text="Путь установки игры:" Foreground="White" FontSize="12" Margin="0,0,0,5"/>
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <TextBox Text="{Binding InstallPath}" Grid.Column="0" Background="#2A2A3E" Foreground="White" 
+                         BorderBrush="#4A90E2" BorderThickness="1" Padding="10" FontSize="12" Height="35"/>
+                <Button Grid.Column="1" Content="📁" Command="{Binding BrowseCommand}" 
+                         Margin="5,0,0,0" Width="40"/>
+            </Grid>
+            <CheckBox IsChecked="{Binding AutoLogin}" Content="Автоматический вход" 
+                      Foreground="White" FontSize="11" Margin="0,15,0,5"/>
+            <CheckBox IsChecked="{Binding CheckUpdates}" Content="Проверять обновления" 
+                      Foreground="White" FontSize="11" Margin="0,5,0,0"/>
+        </StackPanel>
+        <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,20,0,10">
+            <Button Content="🔍 Проверить файлы" Command="{Binding VerifyCommand}" Margin="0,0,5,0"/>
+            <Button Content="🔄 Переустановить" Command="{Binding ReinstallCommand}" Margin="5,0,0,0"/>
+        </StackPanel>
+        <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Center">
+            <TextBlock Text="{Binding StatusMessage}" Foreground="{Binding StatusBrush}" FontSize="10" 
+                       VerticalAlignment="Center" Margin="0,0,10,0"/>
+            <Button Content="💾 Сохранить" Command="{Binding SaveCommand}" Margin="0,0,10,0"/>
+            <Button Content="❌ Закрыть" Command="{Binding CloseCommand}" />
+        </StackPanel>
+    </Grid>
+</Window>

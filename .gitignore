@@ -1,0 +1,12 @@
+bin/
+obj/
+.vs/
+src/**/bin/
+src/**/obj/
+src/**/Launcher.ServiceLib/bin/
+src/**/Launcher.ServiceLib/obj/
+src/**/Launcher.Host/bin/
+src/**/Launcher.Host/obj/
+src/**/Launcher.WPF/bin/
+src/**/Launcher.WPF/obj/
+src/**/config.json

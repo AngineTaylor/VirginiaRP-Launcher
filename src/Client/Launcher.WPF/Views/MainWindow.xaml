@@ -1,0 +1,356 @@
+<Window x:Class="Launcher.WPF.Views.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:services="clr-namespace:Launcher.WPF.Services"
+        Title="Unturned RolePlay Launcher"
+        Height="700" Width="1000"
+        WindowStartupLocation="CenterScreen"
+        ResizeMode="CanMinimize"
+        AllowsTransparency="True"
+        WindowStyle="None"
+        Background="Transparent">
+
+    <Window.Resources>
+        <services:BoolToVisibilityConverter x:Key="BoolToVis"/>
+        <services:InverseBoolToVisibilityConverter x:Key="InverseBoolToVis"/>
+
+        <Style x:Key="ModernButton" TargetType="Button">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="border" Background="{TemplateBinding Background}" BorderBrush="#4A90E2" BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="8">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="border" Property="Background" Value="#1A4A90E2"/>
+                                <Setter TargetName="border" Property="BorderBrush" Value="#6BA8FF"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="border" Property="Background" Value="#2A4A90E2"/>
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter TargetName="border" Property="Background" Value="#333344"/>
+                                <Setter TargetName="border" Property="BorderBrush" Value="#555566"/>
+                                <Setter Property="Foreground" Value="#888899"/>
+                                <Setter Property="Cursor" Value="Arrow"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="GradientButton" TargetType="Button" BasedOn="{StaticResource ModernButton}">
+            <Setter Property="Background">
+                <Setter.Value>
+                    <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                        <GradientStop Color="#4A90E2" Offset="0"/>
+                        <GradientStop Color="#357ABD" Offset="1"/>
+                    </LinearGradientBrush>
+                </Setter.Value>
+            </Setter>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="Height" Value="45"/>
+            <Setter Property="Padding" Value="20,8"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Style.Triggers>
+                <Trigger Property="IsEnabled" Value="False">
+                    <Setter Property="Background">
+                        <Setter.Value>
+                            <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                                <GradientStop Color="#666666" Offset="0"/>
+                                <GradientStop Color="#555555" Offset="1"/>
+                            </LinearGradientBrush>
+                        </Setter.Value>
+                    </Setter>
+                    <Setter Property="Foreground" Value="#999999"/>
+                    <Setter Property="Cursor" Value="Arrow"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style x:Key="LinkButton" TargetType="Button">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Foreground" Value="#888888"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="FontSize" Value="11"/>
+            <Setter Property="FontWeight" Value="Normal"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <!-- Убрана прозрачность по умолчанию -->
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <!-- При наведении только меняем цвет, без изменения прозрачности -->
+                    <Setter Property="Foreground" Value="#AAAAAA"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style x:Key="ContentBackground" TargetType="Border">
+            <Setter Property="Background" Value="#1A1A2E"/>
+            <Setter Property="CornerRadius" Value="12"/>
+        </Style>
+    </Window.Resources>
+
+    <Grid>
+        <Grid.Background>
+            <ImageBrush ImageSource="/image/background.png" Stretch="UniformToFill"/>
+        </Grid.Background>
+
+        <Grid Margin="20">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <!-- Header -->
+            <Border Grid.Row="0" Style="{StaticResource ContentBackground}" Padding="20,15" Margin="0,0,0,20">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
+                        <TextBlock Text="🎮" FontSize="24" Margin="0,0,15,0"/>
+                        <TextBlock Text="UNTRN RP" FontSize="24" FontWeight="Bold" Foreground="White"/>
+                        <TextBlock Text="LAUNCHER" FontSize="14" FontWeight="Light" Foreground="#4A90E2" Margin="5,5,0,0"/>
+                    </StackPanel>
+                    <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
+                        <Border Background="#2A2A3E" CornerRadius="20" Padding="15,8">
+                            <StackPanel Orientation="Horizontal">
+                                <Ellipse Width="8" Height="8" Fill="#00FF00" Margin="0,0,8,0" VerticalAlignment="Center"/>
+                                <TextBlock Text="{Binding OnlineText}" Foreground="White" FontWeight="SemiBold"/>
+                            </StackPanel>
+                        </Border>
+                    </StackPanel>
+                    <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center">
+                        <Button Content="─" Style="{StaticResource ModernButton}" Width="30" Height="30" FontSize="12" Command="{Binding MinimizeCommand}"/>
+                        <Button Content="✕" Style="{StaticResource ModernButton}" Width="30" Height="30" FontSize="12" Command="{Binding CloseCommand}"/>
+                    </StackPanel>
+                </Grid>
+            </Border>
+
+            <!-- Основной контент -->
+            <Grid Grid.Row="1" Margin="0,0,0,20">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="2*"/>
+                    <ColumnDefinition Width="3*"/>
+                </Grid.ColumnDefinitions>
+
+                <!-- Левая колонка - персонажи -->
+                <StackPanel Grid.Column="0" Margin="0,0,10,0">
+                    <!-- Авторизация -->
+                    <Border Style="{StaticResource ContentBackground}" Padding="20"
+                            Visibility="{Binding IsAuthenticated, Converter={StaticResource InverseBoolToVis}}"
+                            Margin="0,0,0,20">
+                        <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                            <TextBlock Text="Войдите через Steam" FontSize="18" FontWeight="Bold" Foreground="White" HorizontalAlignment="Center" Margin="0,0,0,15"/>
+                            <Button Content="🚀 Войти через Steam"
+                                    Style="{StaticResource GradientButton}" FontSize="14"
+                                    Command="{Binding LoginCommand}" Width="200"/>
+                            <TextBlock Text="Для доступа к лаунчеру требуется авторизация"
+                                   Foreground="#888" FontSize="11" HorizontalAlignment="Center"
+                                   Margin="0,10,0,0"/>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Информация о пользователе -->
+                    <Border Style="{StaticResource ContentBackground}" Padding="20"
+                            Visibility="{Binding IsAuthenticated, Converter={StaticResource BoolToVis}}"
+                            Margin="0,0,0,20">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+
+                            <!-- Аватарка -->
+                            <Border Grid.Column="0" Width="60" Height="60" CornerRadius="30" Background="#2A2A3E" Margin="0,0,15,0">
+                                <Border ClipToBounds="True" CornerRadius="28">
+                                    <Image Source="{Binding CurrentUser.AvatarUrl}" 
+                                           Width="56" Height="56" 
+                                           Stretch="UniformToFill"/>
+                                </Border>
+                            </Border>
+
+                            <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                                <TextBlock Text="{Binding CurrentUser.UserName}" FontSize="16" FontWeight="Bold" Foreground="White"/>
+                                <TextBlock Text="{Binding CurrentUser.SteamId}" FontSize="11" Foreground="#888" Margin="0,5,0,0"/>
+                            </StackPanel>
+                            <!-- Кнопка Выйть - исправлена прозрачность -->
+                            <Button Grid.Column="2" Content="Выйти" 
+                                    Style="{StaticResource ModernButton}" 
+                                    Command="{Binding LogoutCommand}" 
+                                    VerticalAlignment="Center" 
+                                    Padding="15,8"
+                                    Background="#2A2A3E"
+                                    Foreground="White"/>
+                        </Grid>
+                    </Border>
+
+                    <!-- Слоты персонажей -->
+                    <Border Style="{StaticResource ContentBackground}" Padding="20">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+
+                            <!-- Заголовок с информацией о слотах -->
+                            <Grid Grid.Row="0" Margin="0,0,0,15">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Grid.Column="0" Text="МОИ ПЕРСОНАЖИ" FontSize="16" FontWeight="Bold" Foreground="White"/>
+                                <TextBlock Grid.Column="1" Text="{Binding CharacterLimitText}" FontSize="12" Foreground="#4A90E2" FontWeight="SemiBold"/>
+                            </Grid>
+
+                            <ListBox Grid.Row="1" 
+                                     ItemsSource="{Binding Characters}" 
+                                     SelectedItem="{Binding SelectedCharacter}" 
+                                     Background="#2A2A3E" 
+                                     BorderThickness="0" 
+                                     Margin="0,0,0,15">
+                                <ListBox.ItemTemplate>
+                                    <DataTemplate>
+                                        <Border Background="#2A2A3E" 
+                                                CornerRadius="8" 
+                                                Height="60" 
+                                                Padding="15" 
+                                                Margin="0,5">
+                                            <TextBlock Text="{Binding Nickname}" 
+                                                       Foreground="White" 
+                                                       FontSize="14" 
+                                                       FontWeight="SemiBold" 
+                                                       VerticalAlignment="Center"/>
+                                        </Border>
+                                    </DataTemplate>
+                                </ListBox.ItemTemplate>
+                            </ListBox>
+
+                            <!-- Кнопка СОЗДАТЬ ПЕРСОНАЖА с ограничением -->
+                            <Button Grid.Row="2" 
+                                    Content="🎭 СОЗДАТЬ ПЕРСОНАЖА" 
+                                    Style="{StaticResource GradientButton}" 
+                                    Command="{Binding CreateCharacterCommand}"
+                                    IsEnabled="{Binding CanCreateCharacter}"
+                                    ToolTip="{Binding CreateCharacterToolTip}"/>
+                        </Grid>
+                    </Border>
+                </StackPanel>
+
+                <!-- Правая колонка - новости и кнопки -->
+                <StackPanel Grid.Column="1" Margin="10,0,0,0">
+                    <!-- Новости -->
+                    <Border Style="{StaticResource ContentBackground}" Padding="20" Margin="0,0,0,20">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+
+                            <TextBlock Grid.Row="0" Text="📰 ПОСЛЕДНИЕ НОВОСТИ" FontSize="16" FontWeight="Bold" Foreground="White" Margin="0,0,0,15"/>
+
+                            <ItemsControl Grid.Row="1" 
+                                         ItemsSource="{Binding NewsViewModel.NewsItems}"
+                                         Background="Transparent">
+                                <ItemsControl.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <UniformGrid Columns="1" Rows="3"/>
+                                    </ItemsPanelTemplate>
+                                </ItemsControl.ItemsPanel>
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <Border Background="#2A2A3E" 
+                                                CornerRadius="8" 
+                                                Padding="15" 
+                                                Margin="0,5"
+                                                Height="80">
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="*"/>
+                                                    <ColumnDefinition Width="Auto"/>
+                                                </Grid.ColumnDefinitions>
+
+                                                <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                                                    <TextBlock Text="{Binding Title}" 
+                                                               Foreground="White" 
+                                                               FontSize="12"
+                                                               FontWeight="SemiBold"
+                                                               TextWrapping="Wrap"/>
+                                                    <TextBlock Text="{Binding Summary}" 
+                                                               Foreground="#CCCCCC" 
+                                                               FontSize="10"
+                                                               TextWrapping="Wrap"
+                                                               Margin="0,2,0,0"/>
+                                                </StackPanel>
+
+                                                <TextBlock Grid.Column="1" 
+                                                           Text="{Binding PublishDate, StringFormat='dd.MM.yy'}" 
+                                                           Foreground="#666" 
+                                                           FontSize="9"
+                                                           VerticalAlignment="Top"/>
+                                            </Grid>
+                                        </Border>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </Grid>
+                    </Border>
+
+                    <!-- Кнопки играть и настройки -->
+                    <Grid Margin="0,0,0,15">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="10"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <Button Grid.Column="0" 
+                                Content="⚙️ НАСТРОЙКИ" 
+                                Style="{StaticResource GradientButton}" 
+                                Command="{Binding SettingsCommand}"/>
+
+                        <Button Grid.Column="2" 
+                                Content="🎮 ИГРАТЬ" 
+                                Style="{StaticResource GradientButton}" 
+                                Command="{Binding PlayCommand}"/>
+                    </Grid>
+
+                    <!-- Ссылки на форум/сайт/магазин -->
+                    <Border Background="#2A2A3E" CornerRadius="8" Padding="15,10">
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                            <Button Content="🌐 ФОРУМ" 
+                                    Style="{StaticResource LinkButton}" 
+                                    Command="{Binding OpenForumCommand}"
+                                    Margin="0,0,20,0"/>
+                            <Button Content="🛒 ДОНАТ" 
+                                    Style="{StaticResource LinkButton}" 
+                                    Command="{Binding OpenShopCommand}"
+                                    Margin="0,0,20,0"/>
+                            <Button Content="📋 САЙТ" 
+                                    Style="{StaticResource LinkButton}" 
+                                    Command="{Binding OpenSiteCommand}"/>
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+            </Grid>
+
+            <Border Grid.Row="2" Background="#1A1A2E" CornerRadius="8" Padding="15,10">
+                <TextBlock Text="Unturned RolePlay Launcher v1.0.0 | Developed with ❤️" Foreground="#666" FontSize="10" HorizontalAlignment="Center"/>
+            </Border>
+        </Grid>
+    </Grid>
+</Window>
