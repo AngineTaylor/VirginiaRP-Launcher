@@ -3,30 +3,46 @@ using System;
 
 namespace Launcher.ServiceLib.Data
 {
+    /// <summary>
+    /// Репозиторий для работы с пользователями в базе данных.
+    /// </summary>
     public class UserRepository
     {
+        /// <summary>
+        /// Создаёт пользователя по Steam ID, если он не существует, или обновляет его.
+        /// </summary>
+        /// <param name="steamId">Steam ID пользователя (в формате строки).</param>
+        /// <param name="userName">Имя пользователя.</param>
+        /// <param name="regIp">IP-адрес пользователя (опционально).</param>
+        /// <returns>Возвращает ID пользователя.</returns>
         public int EnsureUserBySteamId(string steamId, string userName, string regIp = null)
         {
             if (!long.TryParse(steamId, out var steamId64))
                 throw new ArgumentException("Invalid SteamId");
 
-            using var conn = Database.GetOpenConnection();
+            using var conn = Database.GetOpenConnection(); // Используем глобальное соединение
             using var cmd = conn.CreateCommand();
             cmd.CommandText = @"
-        INSERT INTO users (steam_id64, username, reg_ip, created_at)
-        VALUES (@steam_id64, @username, @reg_ip, NOW())
-        ON CONFLICT (steam_id64) DO UPDATE
-            SET username = EXCLUDED.username
-        RETURNING id;";
-            cmd.Parameters.AddWithValue("steam_id64", steamId64); // Используем long, а не string
+                INSERT INTO users (steam_id64, username, reg_ip, created_at)
+                VALUES (@steam_id64, @username, @reg_ip, NOW())
+                ON CONFLICT (steam_id64) DO UPDATE
+                    SET username = EXCLUDED.username
+                RETURNING id;";
+            cmd.Parameters.AddWithValue("steam_id64", steamId64);
             cmd.Parameters.AddWithValue("username", userName ?? (object)DBNull.Value);
             cmd.Parameters.AddWithValue("reg_ip", regIp ?? (object)DBNull.Value);
+
             return Convert.ToInt32(cmd.ExecuteScalar());
         }
 
+        /// <summary>
+        /// Обновляет сессию пользователя по ID.
+        /// </summary>
+        /// <param name="userId">ID пользователя.</param>
+        /// <param name="sessionId">ID сессии пользователя.</param>
         public void UpdateSession(int userId, string sessionId)
         {
-            using var conn = Database.GetOpenConnection();
+            using var conn = Database.GetOpenConnection(); // Используем глобальное соединение
             using var cmd = conn.CreateCommand();
             cmd.CommandText = "UPDATE users SET session_id = @sid WHERE id = @id;";
             cmd.Parameters.AddWithValue("sid", sessionId ?? (object)DBNull.Value);
@@ -34,14 +50,19 @@ namespace Launcher.ServiceLib.Data
             cmd.ExecuteNonQuery();
         }
 
+        /// <summary>
+        /// Получает Steam ID пользователя по session ID.
+        /// </summary>
+        /// <param name="sessionId">ID сессии пользователя.</param>
+        /// <returns>Возвращает Steam ID пользователя.</returns>
         public string GetSteamIdBySession(string sessionId)
         {
-            using var conn = Database.GetOpenConnection();
+            using var conn = Database.GetOpenConnection(); // Используем глобальное соединение
             using var cmd = conn.CreateCommand();
             cmd.CommandText = "SELECT steam_id64 FROM users WHERE session_id = @sid;";
-            cmd.Parameters.AddWithValue("sid", sessionId);
+            cmd.Parameters.AddWithValue("sid", sessionId ?? (object)DBNull.Value);
             var result = cmd.ExecuteScalar();
-            return result?.ToString(); // Конвертируем bigint в string
+            return result?.ToString();
         }
     }
 }

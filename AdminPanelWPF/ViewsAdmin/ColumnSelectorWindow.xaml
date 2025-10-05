@@ -1,0 +1,70 @@
+﻿<Window x:Class="AdminPanelWPF.ViewsAdmin.ColumnSelectorWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Выбор колонок" 
+        Height="300" Width="250"
+        WindowStartupLocation="CenterOwner"
+        ResizeMode="NoResize"
+        Background="#2A2F45">
+
+    <Window.Resources>
+        <Style x:Key="CheckBoxStyle" TargetType="CheckBox">
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="Margin" Value="5,3"/>
+        </Style>
+
+        <Style x:Key="ButtonStyle" TargetType="Button">
+            <Setter Property="Background" Value="#4A5F99"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="Padding" Value="15,8"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Cursor" Value="Hand"/>
+        </Style>
+    </Window.Resources>
+
+    <Border BorderBrush="#4A5F99" BorderThickness="1" CornerRadius="8" Margin="10">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <Border Grid.Row="0" Background="#1A1F2F" CornerRadius="8,8,0,0" Padding="15,10">
+                <TextBlock Text="Выберите колонки для отображения" 
+                           Foreground="#E0E0FF" FontWeight="Bold" HorizontalAlignment="Center"/>
+            </Border>
+
+            <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" Padding="15,10">
+                <StackPanel>
+                    <CheckBox Content="ShortId" Style="{StaticResource CheckBoxStyle}" 
+                              IsChecked="{Binding ShowShortId}"/>
+                    <CheckBox Content="Story" Style="{StaticResource CheckBoxStyle}" 
+                              IsChecked="{Binding ShowStory}"/>
+                    <CheckBox Content="CreatedAt" Style="{StaticResource CheckBoxStyle}" 
+                              IsChecked="{Binding ShowCreatedAt}"/>
+                    <CheckBox Content="RegIp" Style="{StaticResource CheckBoxStyle}" 
+                              IsChecked="{Binding ShowRegIp}"/>
+                </StackPanel>
+            </ScrollViewer>
+
+            <Border Grid.Row="2" Background="#1A1F2F" CornerRadius="0,0,8,8" Padding="15,10">
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                    <Button Content="✅ Применить" 
+                            Style="{StaticResource ButtonStyle}"
+                            Command="{Binding ApplyCommand}"
+                            CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=Window}}"
+                            FontWeight="Bold"
+                            Margin="0,0,10,0"/>
+                    <Button Content="❌ Отмена" 
+                            Style="{StaticResource ButtonStyle}"
+                            Command="{Binding CancelCommand}"
+                            CommandParameter="{Binding RelativeSource={RelativeSource AncestorType=Window}}"
+                            Background="#6B7280"/>
+                </StackPanel>
+            </Border>
+        </Grid>
+    </Border>
+</Window>

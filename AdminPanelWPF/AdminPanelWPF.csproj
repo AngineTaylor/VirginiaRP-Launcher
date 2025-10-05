@@ -1,0 +1,16 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UseWPF>true</UseWPF>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\src\Server\Launcher.Host\Launcher.Host.csproj" />
+    <ProjectReference Include="..\src\Server\Launcher.ServiceLib\Launcher.ServiceLib.csproj" />
+  </ItemGroup>
+
+</Project>

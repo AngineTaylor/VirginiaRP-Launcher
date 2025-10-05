@@ -3,21 +3,32 @@ using System;
 
 namespace Launcher.ServiceLib.Data
 {
+    /// <summary>
+    /// Класс для управления подключением и структурой базы данных PostgreSQL.
+    /// </summary>
     public static class Database
     {
+        /// <summary>
+        /// Строка подключения к базе данных PostgreSQL.
+        /// </summary>
         public static readonly string ConnectionString;
 
         static Database()
         {
+            // ⚙️ Настройки соединения с PostgreSQL
             const string host = "95.163.250.75";
             const string port = "5432";
             const string database = "PostgreSQL-9209";
             const string user = "user";
             const string password = "5bS7zN5v6-5b3c62o";
 
+            // ✅ Используем пул соединений и таймауты
             ConnectionString = $"Host={host};Port={port};Database={database};Username={user};Password={password};Pooling=true;Timeout=30;CommandTimeout=30";
         }
 
+        /// <summary>
+        /// Создаёт и открывает новое соединение с БД.
+        /// </summary>
         public static NpgsqlConnection GetOpenConnection()
         {
             var conn = new NpgsqlConnection(ConnectionString);
@@ -25,6 +36,9 @@ namespace Launcher.ServiceLib.Data
             return conn;
         }
 
+        /// <summary>
+        /// Проверяет и создаёт необходимые таблицы и индексы.
+        /// </summary>
         public static void EnsureDatabase()
         {
             using var conn = GetOpenConnection();
@@ -34,10 +48,13 @@ namespace Launcher.ServiceLib.Data
             AddMissingColumns(conn);
         }
 
+        #region === Создание таблиц ===
+
         private static void CreateTables(NpgsqlConnection conn)
         {
             using var cmd = conn.CreateCommand();
 
+            // 🧩 Таблица пользователей
             cmd.CommandText = @"
                 CREATE TABLE IF NOT EXISTS users (
                     id SERIAL PRIMARY KEY,
@@ -49,6 +66,7 @@ namespace Launcher.ServiceLib.Data
                 );";
             cmd.ExecuteNonQuery();
 
+            // 🧩 Таблица персонажей
             cmd.CommandText = @"
                 CREATE TABLE IF NOT EXISTS characters (
                     id SERIAL PRIMARY KEY,
@@ -64,16 +82,25 @@ namespace Launcher.ServiceLib.Data
             cmd.ExecuteNonQuery();
         }
 
+        #endregion
+
+        #region === Создание индексов ===
+
         private static void CreateIndexes(NpgsqlConnection conn)
         {
             using var cmd = conn.CreateCommand();
 
+            // Индексы для ускорения выборок
             cmd.CommandText = @"
                 CREATE INDEX IF NOT EXISTS idx_characters_steam_id64 ON characters(steam_id64);
                 CREATE INDEX IF NOT EXISTS idx_users_steam_id64 ON users(steam_id64);
                 CREATE INDEX IF NOT EXISTS idx_users_session_id ON users(session_id);";
             cmd.ExecuteNonQuery();
         }
+
+        #endregion
+
+        #region === Добавление недостающих колонок и ограничений ===
 
         private static void AddMissingColumns(NpgsqlConnection conn)
         {
@@ -113,5 +140,7 @@ namespace Launcher.ServiceLib.Data
                 END $$;";
             cmd.ExecuteNonQuery();
         }
+
+        #endregion
     }
 }

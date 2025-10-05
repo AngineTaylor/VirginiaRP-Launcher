@@ -2,6 +2,8 @@
 
 namespace Launcher.ServiceLib.Data
 {
+    using System;
+    using System.Runtime.Serialization;
     public class CharacterData
     {
         public int Id { get; set; }

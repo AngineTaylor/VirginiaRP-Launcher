@@ -8,6 +8,7 @@ namespace Launcher.ServiceLib.Contracts
     [ServiceContract]
     public interface ILauncherService
     {
+        // Основные операции
         [OperationContract]
         string Ping();
 
@@ -29,10 +30,11 @@ namespace Launcher.ServiceLib.Contracts
         [OperationContract]
         OnlineDto GetServerOnline();
 
+        // Новая операция для получения новостей
         [OperationContract]
         NewsResponse GetNews();
 
-        // --- Файловые операции ---
+        // Файловые операции
         [OperationContract]
         List<FileInfoDto> GetFileList();
 
@@ -52,16 +54,15 @@ namespace Launcher.ServiceLib.Contracts
         bool SetSettings(string sessionId, SettingsDto settings);
     }
 
+    // =============== DTO ===============
 
-// =============== DTO ===============
-
-[DataContract]
+    [DataContract]
     public class UserDto
     {
         [DataMember] public string SteamId { get; set; }
         [DataMember] public string UserName { get; set; }
         [DataMember] public string SessionId { get; set; }
-        [DataMember] public string AvatarUrl { get; set; }
+        [DataMember] public string AvatarUrl { get; set; }  // Новое поле для URL аватара
         [DataMember] public int Version { get; set; } = 1;
     }
 
@@ -100,7 +101,7 @@ namespace Launcher.ServiceLib.Contracts
     public class VerificationResult
     {
         [DataMember] public bool IsSuccess { get; set; }
-        [DataMember] public List<string> MissingFiles { get; set; } = [];
+        [DataMember] public List<string> MissingFiles { get; set; } = new List<string>();
         [DataMember] public int Version { get; set; } = 1;
     }
 
@@ -110,4 +111,12 @@ namespace Launcher.ServiceLib.Contracts
         [DataMember] public string InstallPath { get; set; } = string.Empty;
         [DataMember] public int Version { get; set; } = 1;
     }
+
+    /*// Новый класс для получения новостей
+    [DataContract]
+    public class NewsResponse
+    {
+        [DataMember] public List<string> News { get; set; } = new List<string>();
+        [DataMember] public int Version { get; set; } = 1;
+    }*/
 }
