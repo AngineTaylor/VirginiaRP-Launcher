@@ -19,6 +19,8 @@ namespace Launcher.Host
             if (!InitializeDatabase())
                 return;
 
+            LogDatabaseStatistics();
+
             if (!StartWcfService())
                 return;
 
@@ -30,6 +32,9 @@ namespace Launcher.Host
             StopWcfService();
         }
 
+        // ============================
+        // 🔹 ИНИЦИАЛИЗАЦИЯ БАЗЫ
+        // ============================
         private static bool InitializeDatabase()
         {
             try
@@ -40,7 +45,7 @@ namespace Launcher.Host
                 Console.WriteLine(Database.ConnectionString);
 
                 Console.ForegroundColor = ConsoleColor.Cyan;
-                Console.WriteLine("⏳ Проверка доступности базы...");
+                Console.WriteLine("⏳ Проверка доступности базы и создание таблиц...");
                 Console.ResetColor();
 
                 Database.EnsureDatabase();
@@ -61,6 +66,74 @@ namespace Launcher.Host
             }
         }
 
+        // ============================
+        // 🔹 ВЫВОД СТАТИСТИКИ ИЗ БД
+        // ============================
+        private static void LogDatabaseStatistics()
+        {
+            try
+            {
+                var dbManager = new DbManager(Database.ConnectionString);
+
+                Console.ForegroundColor = ConsoleColor.Cyan;
+                Console.WriteLine("\n📊 Загрузка статистики из базы данных...");
+                Console.ResetColor();
+
+                int userCount = dbManager.GetTotalUsersCount();
+                int charCount = dbManager.GetTotalCharactersCount();
+
+                Console.ForegroundColor = ConsoleColor.Green;
+                Console.WriteLine($"✅ Зарегистрировано пользователей: {userCount}");
+                Console.WriteLine($"✅ Создано персонажей: {charCount}");
+                Console.ResetColor();
+
+                if (charCount > 0)
+                    PrintLastCharacters();
+            }
+            catch (Exception ex)
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine("❌ Ошибка при загрузке статистики:");
+                Console.WriteLine(ex.Message);
+                Console.ResetColor();
+            }
+        }
+
+        private static void PrintLastCharacters()
+        {
+            Console.ForegroundColor = ConsoleColor.DarkGray;
+            Console.WriteLine("\n🆕 Последние 3 персонажа:");
+            Console.ResetColor();
+
+            using (var conn = Database.GetOpenConnection())
+            using (var cmd = conn.CreateCommand())
+            {
+                cmd.CommandText = @"
+            SELECT nickname, steam_id64, created_at 
+            FROM characters 
+            ORDER BY created_at DESC 
+            LIMIT 3;";
+
+                using (var reader = cmd.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        string nick = reader.IsDBNull(reader.GetOrdinal("nickname"))
+                            ? "(без имени)"
+                            : reader.GetString(reader.GetOrdinal("nickname"));
+                        long steam = reader.GetInt64(reader.GetOrdinal("steam_id64"));
+                        DateTime created = reader.GetDateTime(reader.GetOrdinal("created_at"));
+
+                        Console.WriteLine($"  • {nick} | Steam: {steam} | {created:yyyy-MM-dd HH:mm}");
+                    }
+                }
+            }
+        }
+
+
+        // ============================
+        // 🔹 ЗАПУСК WCF-СЕРВИСА
+        // ============================
         private static bool StartWcfService()
         {
             try
@@ -161,12 +234,18 @@ namespace Launcher.Host
             }
         }
 
+        // ============================
+        // 🔹 НАСТРОЙКА ПОВЕДЕНИЙ WCF
+        // ============================
         private static void ConfigureServiceBehaviors(ServiceHost host)
         {
             // ServiceMetadataBehavior
-            var metadataBehavior = host.Description.Behaviors.Find<ServiceMetadataBehavior>()
-                ?? new ServiceMetadataBehavior();
-            host.Description.Behaviors.Add(metadataBehavior);
+            var metadataBehavior = host.Description.Behaviors.Find<ServiceMetadataBehavior>();
+            if (metadataBehavior == null)
+            {
+                metadataBehavior = new ServiceMetadataBehavior();
+                host.Description.Behaviors.Add(metadataBehavior);
+            }
 
             host.AddServiceEndpoint(
                 typeof(IMetadataExchange),

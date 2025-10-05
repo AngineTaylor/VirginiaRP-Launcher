@@ -1,0 +1,109 @@
+﻿<Window x:Class="Admin.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Admin"
+        mc:Ignorable="d"
+        Title="Админ-панель Лаунчера" Height="580" Width="950"
+        Background="#1A1F2F">
+
+    <Window.Resources>
+        <BooleanToVisibilityConverter x:Key="BoolToVisibilityConverter"/>
+    </Window.Resources>
+
+    <Grid Margin="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- Заголовок -->
+        <TextBlock Text="Virginia ConsoleLog" 
+                   FontSize="32" FontWeight="Bold" Foreground="#E0E0FF" 
+                   HorizontalAlignment="Center" Margin="0,0,0,15"/>
+
+        <!-- Панель поиска и сортировки -->
+        <StackPanel Orientation="Horizontal" Grid.Row="1" Margin="0,0,0,15">
+            <TextBlock Text="Поиск (ID / Имя):" VerticalAlignment="Center" Foreground="#D0D0FF" Margin="0,0,8,0"/>
+            <TextBox Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}" 
+                     Width="220" Height="28" Background="#2A2F45" Foreground="White" BorderBrush="#4A5F99" Padding="6"/>
+            <TextBlock Text="Сортировка:" VerticalAlignment="Center" Foreground="#D0D0FF" Margin="20,0,8,0"/>
+            <ComboBox ItemsSource="{Binding SortOptions}" 
+                      SelectedItem="{Binding SelectedSortOption}" 
+                      DisplayMemberPath="DisplayName"
+                      Width="220" Height="28"
+                      Background="#2A2F45" Foreground="White" BorderBrush="#4A5F99">
+                <ComboBox.ItemContainerStyle>
+                    <Style TargetType="ComboBoxItem">
+                        <Setter Property="Background" Value="#2A2F45"/>
+                        <Setter Property="Foreground" Value="White"/>
+                    </Style>
+                </ComboBox.ItemContainerStyle>
+            </ComboBox>
+        </StackPanel>
+
+        <!-- Кнопка для выбора колонок -->
+        <Button Content="📊 Доп. информация" Grid.Row="2" Width="150" Height="28" 
+                HorizontalAlignment="Left" Command="{Binding ToggleExtraInfoCommand}" Margin="0,0,0,10"
+                Background="#4A5F99" Foreground="White" BorderThickness="0" Cursor="Hand"/>
+
+        <!-- DataGrid с именем -->
+        <DataGrid x:Name="CharactersDataGrid"
+                  ItemsSource="{Binding CharactersView}" 
+                  Grid.Row="3" AutoGenerateColumns="False" IsReadOnly="True"
+                  SelectionMode="Single" CanUserAddRows="False"
+                  Background="#222840" RowBackground="#2A3048" AlternatingRowBackground="#252B40" BorderBrush="#4A5F99"
+                  HeadersVisibility="All">
+
+            <DataGrid.CellStyle>
+                <Style TargetType="DataGridCell">
+                    <Setter Property="Foreground" Value="White"/>
+                    <Setter Property="Background" Value="Transparent"/>
+                    <Setter Property="BorderThickness" Value="0"/>
+                    <Setter Property="Padding" Value="5,3"/>
+                </Style>
+            </DataGrid.CellStyle>
+
+            <DataGrid.ColumnHeaderStyle>
+                <Style TargetType="DataGridColumnHeader">
+                    <Setter Property="Foreground" Value="White"/>
+                    <Setter Property="Background" Value="#4A5F99"/>
+                    <Setter Property="FontWeight" Value="Bold"/>
+                    <Setter Property="Padding" Value="5,3"/>
+                </Style>
+            </DataGrid.ColumnHeaderStyle>
+
+            <DataGrid.InputBindings>
+                <MouseBinding MouseAction="LeftDoubleClick" 
+                              Command="{Binding PlayerDoubleClickCommand}" 
+                              CommandParameter="{Binding SelectedItem, RelativeSource={RelativeSource AncestorType=DataGrid}}"/>
+            </DataGrid.InputBindings>
+
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="ID" Binding="{Binding Id}" Width="70"/>
+                <DataGridTextColumn Header="Имя" Binding="{Binding Nickname}" Width="*"/>
+                <DataGridTemplateColumn Header="Онлайн" Width="90">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <Border Width="16" Height="16" CornerRadius="8">
+                                <Border.Style>
+                                    <Style TargetType="Border">
+                                        <Setter Property="Background" Value="Red"/>
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding IsOnline}" Value="True">
+                                                <Setter Property="Background" Value="LimeGreen"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Border.Style>
+                            </Border>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+            </DataGrid.Columns>
+        </DataGrid>
+    </Grid>
+</Window>
