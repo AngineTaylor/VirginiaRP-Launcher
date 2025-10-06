@@ -1,41 +1,37 @@
 ﻿using Launcher.ServiceLib.Data;
 using System;
 using System.ComponentModel;
-using System.Runtime.CompilerServices;
 
 namespace Admin.ViewModelsAdmin
 {
     public class AdminCharacterViewModel : INotifyPropertyChanged
     {
-        public CharacterData Original { get; }
+        private readonly CharacterData _character;
 
-        public AdminCharacterViewModel(CharacterData data)
+        public AdminCharacterViewModel(CharacterData character)
         {
-            Original = data;
+            _character = character ?? throw new ArgumentNullException(nameof(character));
         }
 
-        public int Id => Original.Id;
-        public string Nickname => Original.Nickname ?? "(Без имени)";
-        public int ShortId => Original.ShortId;
-        public string Story => Original.Story ?? "(Нет истории)";
-        public string RegIp => Original.RegIp ?? "(Нет IP)";
-        public DateTime CreatedAt => Original.CreatedAt;
+        public int Id => _character.Id;
+        public int ShortId => _character.ShortId;
+        public string Nickname => _character.Nickname;
+        public int Age => _character.Age;
+        public string Story => _character.Story;
+        public long SteamId64 => _character.SteamId64;
+        public DateTime CreatedAt => _character.CreatedAt;
+        public string RegIp => _character.RegIp;
+        public bool IsOnline { get; set; } // Заполняется отдельно при загрузке онлайн-статуса
 
-        // Заглушка для статуса онлайн
-        public bool IsOnline
-        {
-            get
-            {
-                // Временная логика - можно заменить на реальную проверку онлайна
-                var random = new Random(Id);
-                return random.Next(0, 2) == 1;
-            }
-        }
+        #region INotifyPropertyChanged
 
         public event PropertyChangedEventHandler PropertyChanged;
-        protected void OnPropertyChanged([CallerMemberName] string propName = null)
+
+        protected virtual void OnPropertyChanged(string propertyName = null)
         {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propName));
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
+
+        #endregion
     }
 }

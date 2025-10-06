@@ -1,41 +1,37 @@
 ﻿using Launcher.ServiceLib.Data;
 using System;
-using System.ComponentModel;
-using System.Runtime.CompilerServices;
 
 namespace Admin.ViewModelsAdmin
 {
-    public class AdminCharacterViewModel : INotifyPropertyChanged
+    public class AdminCharacterViewModel
     {
-        public CharacterData Original { get; }
+        private readonly CharacterData _character;
 
-        public AdminCharacterViewModel(CharacterData data)
+        public AdminCharacterViewModel(CharacterData character)
         {
-            Original = data;
+            _character = character ?? throw new ArgumentNullException(nameof(character));
+
+            Id = character.Id;
+            ShortId = character.ShortId;
+            Nickname = character.Nickname;
+            Age = character.Age;
+            Story = character.Story;
+            SteamId64 = character.SteamId64;
+            RegIp = character.RegIp;
+            CreatedAt = character.CreatedAt;
+
+            // Если есть логика определения онлайн-статуса
+            IsOnline = false; // Пока заглушка
         }
 
-        public int Id => Original.Id;
-        public string Nickname => Original.Nickname ?? "(Без имени)";
-        public int ShortId => Original.ShortId;
-        public string Story => Original.Story ?? "(Нет истории)";
-        public string RegIp => Original.RegIp ?? "(Нет IP)";
-        public DateTime CreatedAt => Original.CreatedAt;
-
-        // Заглушка для статуса онлайн
-        public bool IsOnline
-        {
-            get
-            {
-                // Временная логика - можно заменить на реальную проверку онлайна
-                var random = new Random(Id);
-                return random.Next(0, 2) == 1;
-            }
-        }
-
-        public event PropertyChangedEventHandler PropertyChanged;
-        protected void OnPropertyChanged([CallerMemberName] string propName = null)
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propName));
-        }
+        public int Id { get; }
+        public int ShortId { get; }
+        public string Nickname { get; }
+        public int Age { get; }
+        public string Story { get; }
+        public long SteamId64 { get; }
+        public string RegIp { get; }
+        public DateTime CreatedAt { get; }
+        public bool IsOnline { get; set; }
     }
 }

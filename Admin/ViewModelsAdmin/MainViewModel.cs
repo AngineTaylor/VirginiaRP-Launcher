@@ -7,9 +7,6 @@ using System.ComponentModel;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
-using Launcher.ServiceLib;
-
-
 
 namespace Admin.ViewModelsAdmin
 {
@@ -24,7 +21,6 @@ namespace Admin.ViewModelsAdmin
             _dataGrid = dataGrid;
         }
 
-        // Храним один экземпляр ViewModel окна для сохранения галочек
         private readonly ColumnSelectorViewModel _columnSelectorViewModel = new ColumnSelectorViewModel();
 
         public MainViewModel()
@@ -43,11 +39,9 @@ namespace Admin.ViewModelsAdmin
 
         public ObservableCollection<DataGridColumn> ExtraColumns { get; } = new ObservableCollection<DataGridColumn>();
 
-        // Команды
         public RelayCommand<object> ToggleExtraInfoCommand { get; }
         public RelayCommand<AdminCharacterViewModel> PlayerDoubleClickCommand { get; }
 
-        // Поиск
         public string SearchText
         {
             get => _searchText;
@@ -59,7 +53,6 @@ namespace Admin.ViewModelsAdmin
             }
         }
 
-        // Сортировка
         public class SortOption
         {
             public string DisplayName { get; set; }
@@ -96,15 +89,18 @@ namespace Admin.ViewModelsAdmin
                 new SortOption { DisplayName = "CreatedAt ↓", PropertyName = "CreatedAt", Direction = ListSortDirection.Descending },
                 new SortOption { DisplayName = "RegIp ↑", PropertyName = "RegIp", Direction = ListSortDirection.Ascending },
                 new SortOption { DisplayName = "RegIp ↓", PropertyName = "RegIp", Direction = ListSortDirection.Descending },
+                new SortOption { DisplayName = "Age ↑", PropertyName = "Age", Direction = ListSortDirection.Ascending },
+                new SortOption { DisplayName = "Age ↓", PropertyName = "Age", Direction = ListSortDirection.Descending },
+                new SortOption { DisplayName = "SteamId64 ↑", PropertyName = "SteamId64", Direction = ListSortDirection.Ascending },
+                new SortOption { DisplayName = "SteamId64 ↓", PropertyName = "SteamId64", Direction = ListSortDirection.Descending },
                 new SortOption { DisplayName = "Онлайн ↑", PropertyName = "IsOnline", Direction = ListSortDirection.Ascending },
                 new SortOption { DisplayName = "Онлайн ↓", PropertyName = "IsOnline", Direction = ListSortDirection.Descending }
             };
 
             if (SortOptions.Count > 0)
-                SelectedSortOption = SortOptions[0]; // сортировка по умолчанию
+                SelectedSortOption = SortOptions[0];
         }
 
-        // Метод открытия окна выбора колонок
         private void ShowColumnSelector()
         {
             var window = new ColumnSelectorWindow
@@ -132,11 +128,14 @@ namespace Admin.ViewModelsAdmin
             {
                 if (window.ShowDialog() == true)
                 {
+                    // Передаём все булевы флаги
                     UpdateExtraColumns(
                         _columnSelectorViewModel.ShowShortId,
                         _columnSelectorViewModel.ShowStory,
                         _columnSelectorViewModel.ShowCreatedAt,
-                        _columnSelectorViewModel.ShowRegIp
+                        _columnSelectorViewModel.ShowRegIp,
+                        _columnSelectorViewModel.ShowAge,
+                        _columnSelectorViewModel.ShowSteamId64
                     );
                 }
             }
@@ -147,19 +146,18 @@ namespace Admin.ViewModelsAdmin
             }
         }
 
-        private void UpdateExtraColumns(bool showShortId, bool showStory, bool showCreatedAt, bool showRegIp)
+        private void UpdateExtraColumns(bool showShortId, bool showStory, bool showCreatedAt, bool showRegIp, bool showAge, bool showSteamId64)
         {
             if (_dataGrid == null) return;
 
             // Сохраняем фиксированные колонки: ID, Имя, Онлайн
-            var fixedColumns = new List<DataGridColumn>
+            var fixedColumns = new System.Collections.Generic.List<DataGridColumn>
     {
         _dataGrid.Columns[0], // ID
         _dataGrid.Columns[1], // Имя
         _dataGrid.Columns[2]  // Онлайн
     };
 
-            // Очищаем все колонки
             _dataGrid.Columns.Clear();
 
             // Возвращаем фиксированные
@@ -168,14 +166,49 @@ namespace Admin.ViewModelsAdmin
 
             // Добавляем динамические колонки
             if (showShortId)
-                _dataGrid.Columns.Add(new DataGridTextColumn { Header = "ShortId", Binding = new Binding("ShortId"), Width = 80 });
+                _dataGrid.Columns.Add(new DataGridTextColumn
+                {
+                    Header = "ShortId",
+                    Binding = new System.Windows.Data.Binding("ShortId"),
+                    Width = 80
+                });
             if (showStory)
-                _dataGrid.Columns.Add(new DataGridTextColumn { Header = "Story", Binding = new Binding("Story"), Width = 120 });
+                _dataGrid.Columns.Add(new DataGridTextColumn
+                {
+                    Header = "Story",
+                    Binding = new System.Windows.Data.Binding("Story"),
+                    Width = 120
+                });
             if (showCreatedAt)
-                _dataGrid.Columns.Add(new DataGridTextColumn { Header = "CreatedAt", Binding = new Binding("CreatedAt"), Width = 120 });
+                _dataGrid.Columns.Add(new DataGridTextColumn
+                {
+                    Header = "CreatedAt",
+                    Binding = new System.Windows.Data.Binding("CreatedAt"),
+                    Width = 140
+                });
             if (showRegIp)
-                _dataGrid.Columns.Add(new DataGridTextColumn { Header = "RegIp", Binding = new Binding("RegIp"), Width = 120 });
+                _dataGrid.Columns.Add(new DataGridTextColumn
+                {
+                    Header = "RegIp",
+                    Binding = new System.Windows.Data.Binding("RegIp"),
+                    Width = 120
+                });
+            if (showAge)
+                _dataGrid.Columns.Add(new DataGridTextColumn
+                {
+                    Header = "Age",
+                    Binding = new System.Windows.Data.Binding("Age"),
+                    Width = 60
+                });
+            if (showSteamId64)
+                _dataGrid.Columns.Add(new DataGridTextColumn
+                {
+                    Header = "SteamId64",
+                    Binding = new System.Windows.Data.Binding("SteamId64"),
+                    Width = 150
+                });
         }
+
 
         private void LoadCharactersFromDatabase()
         {
@@ -192,8 +225,6 @@ namespace Admin.ViewModelsAdmin
                 MessageBox.Show($"Ошибка загрузки из БД: {ex.Message}", "Ошибка");
             }
         }
-
-
 
         private void ApplyFilter()
         {
@@ -225,7 +256,17 @@ namespace Admin.ViewModelsAdmin
             if (player != null)
             {
                 var status = player.IsOnline ? "ОНЛАЙН" : "ОФФЛАЙН";
-                MessageBox.Show($"Игрок: {player.Nickname}\nID: {player.Id}\nСтатус: {status}", "Информация об игроке");
+                MessageBox.Show(
+                    $"Игрок: {player.Nickname}\n" +
+                    $"ID: {player.Id}\n" +
+                    $"Age: {player.Age}\n" +
+                    $"SteamId64: {player.SteamId64}\n" +
+                    $"ShortId: {player.ShortId}\n" +
+                    $"RegIp: {player.RegIp}\n" +
+                    $"Story: {player.Story}\n" +
+                    $"CreatedAt: {player.CreatedAt}\n" +
+                    $"Статус: {status}",
+                    "Информация об игроке");
             }
         }
 
