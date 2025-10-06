@@ -6,11 +6,17 @@ namespace Admin.ViewModelsAdmin
 {
     public class ColumnSelectorViewModel
     {
+        // Существующие колонки
         public bool ShowShortId { get; set; } = false;
         public bool ShowStory { get; set; } = false;
         public bool ShowCreatedAt { get; set; } = false;
         public bool ShowRegIp { get; set; } = false;
 
+        // Новые колонки
+        public bool ShowAge { get; set; } = false;
+        public bool ShowSteamId64 { get; set; } = false;
+
+        // Команды для кнопок
         public ICommand ApplyCommand { get; }
         public ICommand CancelCommand { get; }
 
