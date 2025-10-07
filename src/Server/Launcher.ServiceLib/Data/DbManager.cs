@@ -20,20 +20,31 @@ namespace Launcher.ServiceLib.Data
         // DTO для администратора
         public class AdminData
         {
+            public string Id { get; set; }
             public string LoginAdmin { get; set; }
             public string PasswordAdmin { get; set; }
             public string Rang { get; set; }
         }
 
-        // Заглушка списка админов
         public List<AdminData> GetAllAdmins()
         {
-            return new List<AdminData>
-            {
-                new AdminData { LoginAdmin = "admin1", PasswordAdmin = "123", Rang = "Lead" },
-                new AdminData { LoginAdmin = "admin2", PasswordAdmin = "abc", Rang = "Small" }
-            };
+            using var db = Database.GetOpenConnection();
+
+            // ⚠️ Предполагается, что таблица admins имеет колонки: id, login, password, rang
+            var sql = @"
+        SELECT 
+            id AS Id,
+            login AS LoginAdmin, 
+            password AS PasswordAdmin, 
+            rang AS Rang
+        FROM admins
+        ORDER BY login;";
+
+            var admins = db.Query<AdminData>(sql).ToList();
+
+            return admins;
         }
+
 
         #endregion
 

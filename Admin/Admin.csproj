@@ -64,6 +64,7 @@
     <Compile Include="ServicesAdmin\AdminRelayCommand.cs" />
     <Compile Include="ServicesAdmin\DataGridColumnsBehavior.cs" />
     <Compile Include="ServicesAdmin\OnlineStatusBrushConverter.cs" />
+    <Compile Include="ServicesAdmin\PasswordBoxHelper.cs" />
     <Compile Include="ViewModelsAdmin\AdminCharacterViewModel.cs" />
     <Compile Include="ViewModelsAdmin\AdminLoginViewModel.cs" />
     <Compile Include="ViewModelsAdmin\BaseViewModel.cs" />

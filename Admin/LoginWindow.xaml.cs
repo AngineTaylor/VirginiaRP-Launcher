@@ -23,7 +23,7 @@ namespace Admin
         public LoginWindow()
         {
             InitializeComponent();
-            DataContext = new LoginViewModel();
+            DataContext = new AdminLoginViewModel();
         }
     }
 }

@@ -1,9 +1,9 @@
-﻿using Launcher.ServiceLib.Data;
-using System;
+﻿using Launcher.ServiceLib.Contracts;
+using Launcher.ServiceLib.Data;
 using System.Linq;
 using static Launcher.ServiceLib.Data.DbManager;
 
-namespace Launcher.ServiceLib.Contracts
+namespace Admin.ServicesAdmin
 {
     public class AuthAdmin
     {
@@ -15,21 +15,25 @@ namespace Launcher.ServiceLib.Contracts
         }
 
         /// <summary>
-        /// Аутентифицирует администратора. Возвращает данные админа при успешной аутентификации, иначе null.
+        /// Аутентификация администратора по логину и паролю.
         /// </summary>
+        /// <param name="login">Логин администратора</param>
+        /// <param name="password">Пароль администратора</param>
+        /// <returns>AdminData при успешной аутентификации, иначе null</returns>
         public AdminData AuthenticateAdmin(string login, string password)
         {
+            if (string.IsNullOrWhiteSpace(login) || string.IsNullOrWhiteSpace(password))
+                return null;
+
+            // Получаем всех админов
             var admins = _dbManager.GetAllAdmins();
 
+            // Находим совпадение по логину и паролю
             var admin = admins.FirstOrDefault(a =>
-                string.Equals(a.LoginAdmin, login, StringComparison.OrdinalIgnoreCase));
+                a.LoginAdmin.Trim() == login.Trim() &&
+                a.PasswordAdmin.Trim() == password.Trim());
 
-            if (admin == null) return null;             // логин не найден
-            if (admin.PasswordAdmin != password) return null;  // пароль неверный
-
-            return admin; // успешная аутентификация
+            return admin;
         }
-
-
     }
 }

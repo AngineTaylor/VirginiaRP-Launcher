@@ -89,6 +89,8 @@ namespace Launcher.Host
 
                 if (charCount > 0)
                     PrintLastCharacters();
+
+                PrintAdmins(dbManager);
             }
             catch (Exception ex)
             {
@@ -105,31 +107,58 @@ namespace Launcher.Host
             Console.WriteLine("\n🆕 Последние 3 персонажа:");
             Console.ResetColor();
 
-            using (var conn = Database.GetOpenConnection())
-            using (var cmd = conn.CreateCommand())
+            using var conn = Database.GetOpenConnection();
+            using var cmd = conn.CreateCommand();
+            cmd.CommandText = @"
+                SELECT nickname, steam_id64, created_at 
+                FROM characters 
+                ORDER BY created_at DESC 
+                LIMIT 3;";
+
+            using var reader = cmd.ExecuteReader();
+            while (reader.Read())
             {
-                cmd.CommandText = @"
-            SELECT nickname, steam_id64, created_at 
-            FROM characters 
-            ORDER BY created_at DESC 
-            LIMIT 3;";
-
-                using (var reader = cmd.ExecuteReader())
-                {
-                    while (reader.Read())
-                    {
-                        string nick = reader.IsDBNull(reader.GetOrdinal("nickname"))
-                            ? "(без имени)"
-                            : reader.GetString(reader.GetOrdinal("nickname"));
-                        long steam = reader.GetInt64(reader.GetOrdinal("steam_id64"));
-                        DateTime created = reader.GetDateTime(reader.GetOrdinal("created_at"));
-
-                        Console.WriteLine($"  • {nick} | Steam: {steam} | {created:yyyy-MM-dd HH:mm}");
-                    }
-                }
+                string nick = reader.IsDBNull(reader.GetOrdinal("nickname")) ? "(без имени)" : reader.GetString(reader.GetOrdinal("nickname"));
+                long steam = reader.GetInt64(reader.GetOrdinal("steam_id64"));
+                DateTime created = reader.GetDateTime(reader.GetOrdinal("created_at"));
+                Console.WriteLine($"  • {nick} | Steam: {steam} | {created:yyyy-MM-dd HH:mm}");
             }
         }
 
+        // ============================
+        // 🔹 ВЫВОД АДМИНИСТРАТОРОВ
+        // ============================
+        private static void PrintAdmins(DbManager dbManager)
+        {
+            try
+            {
+                var admins = dbManager.GetAllAdmins();
+
+                if (admins.Count == 0)
+                {
+                    Console.ForegroundColor = ConsoleColor.DarkYellow;
+                    Console.WriteLine("\n⚠️ Администраторы в базе не найдены.");
+                    Console.ResetColor();
+                    return;
+                }
+
+                Console.ForegroundColor = ConsoleColor.Magenta;
+                Console.WriteLine("\n🛡️ Список администраторов:");
+                Console.ResetColor();
+
+                foreach (var admin in admins)
+                {
+                    Console.WriteLine($"  • Id: {admin.Id} | Login: {admin.LoginAdmin} | Rang: {admin.Rang}");
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine("❌ Ошибка при загрузке администраторов:");
+                Console.WriteLine(ex.Message);
+                Console.ResetColor();
+            }
+        }
 
         // ============================
         // 🔹 ЗАПУСК WCF-СЕРВИСА

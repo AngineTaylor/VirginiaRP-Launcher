@@ -4,22 +4,32 @@
         Title="Admin Login" Height="300" Width="400"
         ResizeMode="NoResize" WindowStartupLocation="CenterScreen"
         Background="#1A1F2F">
+
     <Grid Margin="20">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
+            <!-- Заголовок -->
             <RowDefinition Height="Auto"/>
+            <!-- Логин -->
             <RowDefinition Height="Auto"/>
+            <!-- Пароль -->
+            <RowDefinition Height="Auto"/>
+            <!-- Ошибка -->
             <RowDefinition Height="*"/>
+            <!-- Кнопка -->
         </Grid.RowDefinitions>
 
+        <!-- Заголовок -->
         <TextBlock Text="Admin Login" FontSize="28" FontWeight="Bold"
-                   Foreground="#E0E0FF" HorizontalAlignment="Center" Margin="0,0,0,20"/>
+                   Foreground="#E0E0FF" HorizontalAlignment="Center" Margin="0,0,0,20"
+                   Grid.Row="0"/>
 
         <!-- Логин -->
         <StackPanel Orientation="Vertical" Grid.Row="1" Margin="0,0,0,10">
             <TextBlock Text="Логин:" Foreground="#D0D0FF"/>
-            <TextBox Text="{Binding Login, UpdateSourceTrigger=PropertyChanged}"
-                     Height="28" Background="#2A2F45" Foreground="White" BorderBrush="#4A5F99" Padding="5"/>
+            <TextBox Text="{Binding Login, UpdateSourceTrigger=PropertyChanged}" 
+                     Height="28" Background="#2A2F45" Foreground="White" 
+                     BorderBrush="#4A5F99" Padding="5"/>
         </StackPanel>
 
         <!-- Пароль -->
@@ -29,13 +39,13 @@
                          Foreground="White" BorderBrush="#4A5F99" Padding="5"/>
         </StackPanel>
 
-        <!-- Ошибка -->
+        <!-- Сообщение об ошибке -->
         <TextBlock Text="{Binding ErrorMessage}" Foreground="Red" Grid.Row="3"
                    HorizontalAlignment="Center" Margin="0,0,0,10"/>
 
         <!-- Кнопка входа -->
-        <Button Content="Войти" Width="120" Height="32" Grid.Row="3"
-                HorizontalAlignment="Center" VerticalAlignment="Bottom"
+        <Button Content="Войти" Width="120" Height="32" Grid.Row="4"
+                HorizontalAlignment="Center" VerticalAlignment="Top"
                 Background="#4A5F99" Foreground="White" BorderThickness="0"
                 Command="{Binding LoginCommand}"
                 CommandParameter="{Binding ElementName=PasswordBox, Path=Password}"/>

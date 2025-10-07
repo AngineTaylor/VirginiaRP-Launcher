@@ -1,6 +1,7 @@
 ﻿using Admin.ServicesAdmin; // RelayCommand
-using Launcher.ServiceLib.Contracts; // AuthAdmin, AdminData
-using Launcher.WPF.Services; // RelayCommand
+using Launcher.ServiceLib.Contracts; // AdminData
+using Launcher.ServiceLib.Data;
+using Launcher.WPF.Services;
 using System;
 using System.Windows;
 using System.Windows.Input;
@@ -8,15 +9,13 @@ using static Launcher.ServiceLib.Data.DbManager;
 
 namespace Admin.ViewModelsAdmin
 {
-    public class LoginViewModel : BaseViewModel
+    public class AdminLoginViewModel : BaseViewModel
     {
         private readonly AuthAdmin _authAdmin;
 
-        public LoginViewModel()
+        public AdminLoginViewModel()
         {
-            // Инициализация AuthAdmin с DbManager
-            _authAdmin = new AuthAdmin(new Launcher.ServiceLib.Data.DbManager(
-                Launcher.ServiceLib.Data.Database.ConnectionString));
+            _authAdmin = new AuthAdmin(new DbManager(Database.ConnectionString));
 
             // Команда входа
             LoginCommand = new RelayCommand<object>(LoginExecute);
@@ -29,6 +28,13 @@ namespace Admin.ViewModelsAdmin
         {
             get => _login;
             set { _login = value; OnPropertyChanged(); }
+        }
+
+        private string _password;
+        public string Password
+        {
+            get => _password;
+            set { _password = value; OnPropertyChanged(); }
         }
 
         private string _errorMessage;
@@ -44,34 +50,22 @@ namespace Admin.ViewModelsAdmin
 
         private void LoginExecute(object obj)
         {
-            // Получаем пароль из параметра (PasswordBox)
-            string password = obj as string;
-
-            // Проверка на пустые поля
+            string password = obj as string; // пароль приходит из CommandParameter
             if (string.IsNullOrWhiteSpace(Login) || string.IsNullOrWhiteSpace(password))
             {
                 ErrorMessage = "Введите логин и пароль.";
                 return;
             }
 
-            // Аутентификация администратора
-            AdminData admin = _authAdmin.AuthenticateAdmin(Login, password);
+            AdminData admin = _authAdmin.AuthenticateAdmin(Login.Trim(), password.Trim());
 
             if (admin != null)
             {
-                // Создаём окно в зависимости от ранга
-                Window nextWindow = null;
+                ErrorMessage = "";
+                Window nextWindow = string.Equals(admin.Rang, "Lead", StringComparison.OrdinalIgnoreCase)
+                    ? (Window)new MainWindowLead()
+                    : (Window)new MainWindow();
 
-                if (string.Equals(admin.Rang, "Lead", StringComparison.OrdinalIgnoreCase))
-                {
-                    nextWindow = new MainWindowLead();
-                }
-                else
-                {
-                    nextWindow = new MainWindow();
-                }
-
-                // Открываем окно на UI-потоке
                 Application.Current.Dispatcher.Invoke(() =>
                 {
                     nextWindow.Show();
@@ -83,6 +77,8 @@ namespace Admin.ViewModelsAdmin
                 ErrorMessage = "Неверный логин или пароль.";
             }
         }
+
+
 
         private void CloseCurrentWindow()
         {
