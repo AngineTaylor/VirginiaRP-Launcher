@@ -55,10 +55,18 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="LoginWindow.xaml.cs">
+      <DependentUpon>LoginWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="MainWindowLead.xaml.cs">
+      <DependentUpon>MainWindowLead.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="ServicesAdmin\AdminRelayCommand.cs" />
     <Compile Include="ServicesAdmin\DataGridColumnsBehavior.cs" />
     <Compile Include="ServicesAdmin\OnlineStatusBrushConverter.cs" />
-    <Compile Include="ServicesAdmin\RelayCommand.cs" />
     <Compile Include="ViewModelsAdmin\AdminCharacterViewModel.cs" />
+    <Compile Include="ViewModelsAdmin\AdminLoginViewModel.cs" />
+    <Compile Include="ViewModelsAdmin\BaseViewModel.cs" />
     <Compile Include="ViewModelsAdmin\ColumnSelectorViewModel.cs" />
     <Compile Include="ViewModelsAdmin\DataGridColumnInfo.cs" />
     <Compile Include="ViewModelsAdmin\MainViewModel.cs" />
@@ -69,6 +77,10 @@
     <Compile Include="ViewsAdmin\PlayerDetailsWindow.xaml.cs">
       <DependentUpon>PlayerDetailsWindow.xaml</DependentUpon>
     </Compile>
+    <Page Include="LoginWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -81,6 +93,10 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Page Include="MainWindowLead.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="ViewsAdmin\ColumnSelectorWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>

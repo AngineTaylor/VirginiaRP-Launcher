@@ -27,8 +27,8 @@ namespace Admin.ViewModelsAdmin
         {
             _dbManager = new DbManager(Database.ConnectionString);
 
-            ToggleExtraInfoCommand = new RelayCommand<object>(_ => ShowColumnSelector());
-            PlayerDoubleClickCommand = new RelayCommand<AdminCharacterViewModel>(OnPlayerDoubleClick);
+            ToggleExtraInfoCommand = new AdminRelayCommand<object>(_ => ShowColumnSelector());
+            PlayerDoubleClickCommand = new AdminRelayCommand<AdminCharacterViewModel>(OnPlayerDoubleClick);
 
             LoadCharactersFromDatabase();
             InitializeSortOptions();
@@ -39,8 +39,8 @@ namespace Admin.ViewModelsAdmin
 
         public ObservableCollection<DataGridColumn> ExtraColumns { get; } = new ObservableCollection<DataGridColumn>();
 
-        public RelayCommand<object> ToggleExtraInfoCommand { get; }
-        public RelayCommand<AdminCharacterViewModel> PlayerDoubleClickCommand { get; }
+        public AdminRelayCommand<object> ToggleExtraInfoCommand { get; }
+        public AdminRelayCommand<AdminCharacterViewModel> PlayerDoubleClickCommand { get; }
 
         public string SearchText
         {

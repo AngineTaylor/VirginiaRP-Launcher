@@ -15,7 +15,29 @@ namespace Launcher.ServiceLib.Data
             _userRepository = new UserRepository();
         }
 
-        #region User Methods
+        #region Admin Methods
+
+        // DTO для администратора
+        public class AdminData
+        {
+            public string LoginAdmin { get; set; }
+            public string PasswordAdmin { get; set; }
+            public string Rang { get; set; }
+        }
+
+        // Заглушка списка админов
+        public List<AdminData> GetAllAdmins()
+        {
+            return new List<AdminData>
+            {
+                new AdminData { LoginAdmin = "admin1", PasswordAdmin = "123", Rang = "Lead" },
+                new AdminData { LoginAdmin = "admin2", PasswordAdmin = "abc", Rang = "Small" }
+            };
+        }
+
+        #endregion
+
+        #region User Methods (Steam и пользователи)
 
         public int EnsureUser(string steamId, string userName, string regIp = null)
             => _userRepository.EnsureUserBySteamId(steamId, userName, regIp);
