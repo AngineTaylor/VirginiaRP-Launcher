@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Admin.ViewModelsAdmin;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -20,15 +21,16 @@ namespace Admin
     /// </summary>
     public partial class MainWindowLead : Window
     {
+        private readonly MainViewLeadModel _viewModel;
         public MainWindowLead()
         {
             InitializeComponent();
 
-            // Передаем DataGrid в ViewModel для динамических колонок
-            if (DataContext is ViewModelsAdmin.MainViewLeadModel vm)
-            {
-                vm.SetDataGrid(CharactersDataGrid);
-            }
+            _viewModel = new MainViewLeadModel();
+            DataContext = _viewModel;
+
+            // Передаем DataGrid во ViewModel для работы с колонками
+            _viewModel.SetDataGrid(CharactersDataGrid);
         }
     }
 }
