@@ -25,8 +25,8 @@ namespace Admin.ViewModelsAdmin
 
         public ColumnSelectorViewModel()
         {
-            ApplyCommand = new RelayCommand<object>(_ => ApplyRequested());
-            CancelCommand = new RelayCommand<object>(_ => CancelRequested());
+            ApplyCommand = new AdminRelayCommand<object>(_ => ApplyRequested());
+            CancelCommand = new AdminRelayCommand<object>(_ => CancelRequested());
         }
     }
 }

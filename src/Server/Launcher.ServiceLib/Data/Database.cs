@@ -15,14 +15,12 @@ namespace Launcher.ServiceLib.Data
 
         static Database()
         {
-            // ⚙️ Настройки соединения с PostgreSQL
             const string host = "95.163.250.75";
             const string port = "5432";
             const string database = "PostgreSQL-9209";
             const string user = "user";
             const string password = "5bS7zN5v6-5b3c62o";
 
-            // ✅ Используем пул соединений и таймауты
             ConnectionString = $"Host={host};Port={port};Database={database};Username={user};Password={password};Pooling=true;Timeout=30;CommandTimeout=30";
         }
 
@@ -54,6 +52,19 @@ namespace Launcher.ServiceLib.Data
         {
             using var cmd = conn.CreateCommand();
 
+            // 🛡 Таблица администраторов без created_at
+            cmd.CommandText = @"
+                CREATE TABLE IF NOT EXISTS admins (
+                    id SERIAL PRIMARY KEY,
+                    login VARCHAR(64) NOT NULL UNIQUE,
+                    password VARCHAR(256) NOT NULL,
+                    rang VARCHAR(32) NOT NULL
+                );";
+            int result = cmd.ExecuteNonQuery();
+            Console.WriteLine(result == 0
+                ? "ℹ Таблица 'admins' уже существует."
+                : "✅ Таблица 'admins' создана.");
+
             // 🧩 Таблица пользователей
             cmd.CommandText = @"
                 CREATE TABLE IF NOT EXISTS users (
@@ -80,6 +91,43 @@ namespace Launcher.ServiceLib.Data
                     CONSTRAINT uk_characters_short_id UNIQUE (short_id)
                 );";
             cmd.ExecuteNonQuery();
+
+            // 🔹 Лог администраторов
+            try
+            {
+                using var logCmd = conn.CreateCommand();
+                logCmd.CommandText = @"SELECT id, login, rang FROM admins ORDER BY id;";
+                using var reader = logCmd.ExecuteReader();
+
+                if (!reader.HasRows)
+                {
+                    Console.ForegroundColor = ConsoleColor.Yellow;
+                    Console.WriteLine("⚠️ В таблице 'admins' пока нет администраторов.");
+                    Console.ResetColor();
+                }
+                else
+                {
+                    Console.ForegroundColor = ConsoleColor.Magenta;
+                    Console.WriteLine("🛡 Список администраторов:");
+                    Console.ResetColor();
+
+                    while (reader.Read())
+                    {
+                        int id = reader.GetInt32(reader.GetOrdinal("id"));
+                        string login = reader.GetString(reader.GetOrdinal("login"));
+                        string rang = reader.GetString(reader.GetOrdinal("rang"));
+
+                        Console.WriteLine($"  • Id: {id} | Login: {login} | Rang: {rang}");
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine("❌ Ошибка при чтении администраторов:");
+                Console.WriteLine(ex.Message);
+                Console.ResetColor();
+            }
         }
 
         #endregion
@@ -90,7 +138,6 @@ namespace Launcher.ServiceLib.Data
         {
             using var cmd = conn.CreateCommand();
 
-            // Индексы для ускорения выборок
             cmd.CommandText = @"
                 CREATE INDEX IF NOT EXISTS idx_characters_steam_id64 ON characters(steam_id64);
                 CREATE INDEX IF NOT EXISTS idx_users_steam_id64 ON users(steam_id64);
@@ -106,7 +153,7 @@ namespace Launcher.ServiceLib.Data
         {
             using var cmd = conn.CreateCommand();
 
-            // Добавляем session_id в users, если его нет
+            // session_id в users
             cmd.CommandText = @"
                 DO $$ 
                 BEGIN 
@@ -117,7 +164,7 @@ namespace Launcher.ServiceLib.Data
                 END $$;";
             cmd.ExecuteNonQuery();
 
-            // Убедимся, что username может быть NULL в users
+            // username nullable
             cmd.CommandText = @"
                 DO $$ 
                 BEGIN 
@@ -129,7 +176,7 @@ namespace Launcher.ServiceLib.Data
                 END $$;";
             cmd.ExecuteNonQuery();
 
-            // Добавляем уникальное ограничение для short_id в characters, если его нет
+            // уникальность short_id
             cmd.CommandText = @"
                 DO $$ 
                 BEGIN 

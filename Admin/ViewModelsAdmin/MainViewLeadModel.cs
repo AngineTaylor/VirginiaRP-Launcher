@@ -1,6 +1,7 @@
 ﻿using Admin.ServicesAdmin;
 using Admin.ViewsAdmin;
 using Launcher.ServiceLib.Data;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -10,7 +11,7 @@ using System.Windows.Data;
 
 namespace Admin.ViewModelsAdmin
 {
-    public class MainViewModel : INotifyPropertyChanged
+    public class MainViewLeadModel : INotifyPropertyChanged
     {
         private readonly DbManager _dbManager;
         private string _searchText;
@@ -23,7 +24,7 @@ namespace Admin.ViewModelsAdmin
 
         private readonly ColumnSelectorViewModel _columnSelectorViewModel = new ColumnSelectorViewModel();
 
-        public MainViewModel()
+        public MainViewLeadModel()
         {
             _dbManager = new DbManager(Database.ConnectionString);
 
@@ -36,8 +37,6 @@ namespace Admin.ViewModelsAdmin
 
         public ObservableCollection<AdminCharacterViewModel> Characters { get; } = new ObservableCollection<AdminCharacterViewModel>();
         public ICollectionView CharactersView => CollectionViewSource.GetDefaultView(Characters);
-
-        public ObservableCollection<DataGridColumn> ExtraColumns { get; } = new ObservableCollection<DataGridColumn>();
 
         public AdminRelayCommand<object> ToggleExtraInfoCommand { get; }
         public AdminRelayCommand<AdminCharacterViewModel> PlayerDoubleClickCommand { get; }
@@ -103,6 +102,8 @@ namespace Admin.ViewModelsAdmin
 
         private void ShowColumnSelector()
         {
+            if (_dataGrid == null) return;
+
             var window = new ColumnSelectorWindow
             {
                 Owner = Application.Current.MainWindow,
@@ -128,7 +129,6 @@ namespace Admin.ViewModelsAdmin
             {
                 if (window.ShowDialog() == true)
                 {
-                    // Передаём все булевы флаги
                     UpdateExtraColumns(
                         _columnSelectorViewModel.ShowShortId,
                         _columnSelectorViewModel.ShowStory,
@@ -148,67 +148,33 @@ namespace Admin.ViewModelsAdmin
 
         private void UpdateExtraColumns(bool showShortId, bool showStory, bool showCreatedAt, bool showRegIp, bool showAge, bool showSteamId64)
         {
-            if (_dataGrid == null) return;
+            if (_dataGrid == null || _dataGrid.Columns.Count < 3) return;
 
             // Сохраняем фиксированные колонки: ID, Имя, Онлайн
-            var fixedColumns = new System.Collections.Generic.List<DataGridColumn>
-    {
-        _dataGrid.Columns[0], // ID
-        _dataGrid.Columns[1], // Имя
-        _dataGrid.Columns[2]  // Онлайн
-    };
+            var fixedColumns = new List<DataGridColumn>
+            {
+                _dataGrid.Columns[0],
+                _dataGrid.Columns[1],
+                _dataGrid.Columns[2]
+            };
 
             _dataGrid.Columns.Clear();
-
-            // Возвращаем фиксированные
             foreach (var col in fixedColumns)
                 _dataGrid.Columns.Add(col);
 
-            // Добавляем динамические колонки
             if (showShortId)
-                _dataGrid.Columns.Add(new DataGridTextColumn
-                {
-                    Header = "ShortId",
-                    Binding = new System.Windows.Data.Binding("ShortId"),
-                    Width = 80
-                });
+                _dataGrid.Columns.Add(new DataGridTextColumn { Header = "ShortId", Binding = new System.Windows.Data.Binding("ShortId"), Width = 80 });
             if (showStory)
-                _dataGrid.Columns.Add(new DataGridTextColumn
-                {
-                    Header = "Story",
-                    Binding = new System.Windows.Data.Binding("Story"),
-                    Width = 120
-                });
+                _dataGrid.Columns.Add(new DataGridTextColumn { Header = "Story", Binding = new System.Windows.Data.Binding("Story"), Width = 120 });
             if (showCreatedAt)
-                _dataGrid.Columns.Add(new DataGridTextColumn
-                {
-                    Header = "CreatedAt",
-                    Binding = new System.Windows.Data.Binding("CreatedAt"),
-                    Width = 140
-                });
+                _dataGrid.Columns.Add(new DataGridTextColumn { Header = "CreatedAt", Binding = new System.Windows.Data.Binding("CreatedAt"), Width = 140 });
             if (showRegIp)
-                _dataGrid.Columns.Add(new DataGridTextColumn
-                {
-                    Header = "RegIp",
-                    Binding = new System.Windows.Data.Binding("RegIp"),
-                    Width = 120
-                });
+                _dataGrid.Columns.Add(new DataGridTextColumn { Header = "RegIp", Binding = new System.Windows.Data.Binding("RegIp"), Width = 120 });
             if (showAge)
-                _dataGrid.Columns.Add(new DataGridTextColumn
-                {
-                    Header = "Age",
-                    Binding = new System.Windows.Data.Binding("Age"),
-                    Width = 60
-                });
+                _dataGrid.Columns.Add(new DataGridTextColumn { Header = "Age", Binding = new System.Windows.Data.Binding("Age"), Width = 60 });
             if (showSteamId64)
-                _dataGrid.Columns.Add(new DataGridTextColumn
-                {
-                    Header = "SteamId64",
-                    Binding = new System.Windows.Data.Binding("SteamId64"),
-                    Width = 150
-                });
+                _dataGrid.Columns.Add(new DataGridTextColumn { Header = "SteamId64", Binding = new System.Windows.Data.Binding("SteamId64"), Width = 150 });
         }
-
 
         private void LoadCharactersFromDatabase()
         {
@@ -216,11 +182,10 @@ namespace Admin.ViewModelsAdmin
             {
                 var allCharacters = _dbManager.GetAllCharacters();
                 Characters.Clear();
-
-                foreach (var character in allCharacters)
-                    Characters.Add(new AdminCharacterViewModel(character));
+                foreach (var c in allCharacters)
+                    Characters.Add(new AdminCharacterViewModel(c));
             }
-            catch (System.Exception ex)
+            catch (Exception ex)
             {
                 MessageBox.Show($"Ошибка загрузки из БД: {ex.Message}", "Ошибка");
             }
@@ -232,10 +197,7 @@ namespace Admin.ViewModelsAdmin
             {
                 if (string.IsNullOrEmpty(SearchText)) return true;
                 if (obj is AdminCharacterViewModel vm)
-                {
-                    return vm.Id.ToString().Contains(SearchText) ||
-                           (vm.Nickname?.ToLower().Contains(SearchText.ToLower()) ?? false);
-                }
+                    return vm.Id.ToString().Contains(SearchText) || (vm.Nickname?.ToLower().Contains(SearchText.ToLower()) ?? false);
                 return false;
             };
         }
@@ -243,37 +205,30 @@ namespace Admin.ViewModelsAdmin
         private void ApplySort()
         {
             CharactersView.SortDescriptions.Clear();
-
             if (SelectedSortOption != null)
-            {
-                CharactersView.SortDescriptions.Add(
-                    new SortDescription(SelectedSortOption.PropertyName, SelectedSortOption.Direction));
-            }
+                CharactersView.SortDescriptions.Add(new SortDescription(SelectedSortOption.PropertyName, SelectedSortOption.Direction));
         }
 
         private void OnPlayerDoubleClick(AdminCharacterViewModel player)
         {
-            if (player != null)
-            {
-                var status = player.IsOnline ? "ОНЛАЙН" : "ОФФЛАЙН";
-                MessageBox.Show(
-                    $"Игрок: {player.Nickname}\n" +
-                    $"ID: {player.Id}\n" +
-                    $"Age: {player.Age}\n" +
-                    $"SteamId64: {player.SteamId64}\n" +
-                    $"ShortId: {player.ShortId}\n" +
-                    $"RegIp: {player.RegIp}\n" +
-                    $"Story: {player.Story}\n" +
-                    $"CreatedAt: {player.CreatedAt}\n" +
-                    $"Статус: {status}",
-                    "Информация об игроке");
-            }
+            if (player == null) return;
+
+            var status = player.IsOnline ? "ОНЛАЙН" : "ОФФЛАЙН";
+            MessageBox.Show(
+                $"Игрок: {player.Nickname}\n" +
+                $"ID: {player.Id}\n" +
+                $"Age: {player.Age}\n" +
+                $"SteamId64: {player.SteamId64}\n" +
+                $"ShortId: {player.ShortId}\n" +
+                $"RegIp: {player.RegIp}\n" +
+                $"Story: {player.Story}\n" +
+                $"CreatedAt: {player.CreatedAt}\n" +
+                $"Статус: {status}",
+                "Информация об игроке");
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
         protected virtual void OnPropertyChanged(string propertyName = null)
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        }
+            => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }
 }

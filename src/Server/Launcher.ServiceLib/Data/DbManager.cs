@@ -15,7 +15,40 @@ namespace Launcher.ServiceLib.Data
             _userRepository = new UserRepository();
         }
 
-        #region User Methods
+        #region Admin Methods
+
+        // DTO для администратора
+        public class AdminData
+        {
+            public string Id { get; set; }
+            public string LoginAdmin { get; set; }
+            public string PasswordAdmin { get; set; }
+            public string Rang { get; set; }
+        }
+
+        public List<AdminData> GetAllAdmins()
+        {
+            using var db = Database.GetOpenConnection();
+
+            // ⚠️ Предполагается, что таблица admins имеет колонки: id, login, password, rang
+            var sql = @"
+        SELECT 
+            id AS Id,
+            login AS LoginAdmin, 
+            password AS PasswordAdmin, 
+            rang AS Rang
+        FROM admins
+        ORDER BY login;";
+
+            var admins = db.Query<AdminData>(sql).ToList();
+
+            return admins;
+        }
+
+
+        #endregion
+
+        #region User Methods (Steam и пользователи)
 
         public int EnsureUser(string steamId, string userName, string regIp = null)
             => _userRepository.EnsureUserBySteamId(steamId, userName, regIp);
