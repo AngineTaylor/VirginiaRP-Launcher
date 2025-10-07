@@ -70,6 +70,7 @@
     <Compile Include="ViewModelsAdmin\BaseViewModel.cs" />
     <Compile Include="ViewModelsAdmin\ColumnSelectorViewModel.cs" />
     <Compile Include="ViewModelsAdmin\DataGridColumnInfo.cs" />
+    <Compile Include="ViewModelsAdmin\MainViewLeadModel.cs" />
     <Compile Include="ViewModelsAdmin\MainViewModel.cs" />
     <Compile Include="ViewModelsAdmin\PlayerViewModel.cs" />
     <Compile Include="ViewsAdmin\ColumnSelectorWindow.xaml.cs">

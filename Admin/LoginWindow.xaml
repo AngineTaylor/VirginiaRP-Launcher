@@ -14,7 +14,7 @@
             <RowDefinition Height="Auto"/>
             <!-- Пароль -->
             <RowDefinition Height="Auto"/>
-            <!-- Ошибка -->
+            <!-- Сообщение об ошибке -->
             <RowDefinition Height="*"/>
             <!-- Кнопка -->
         </Grid.RowDefinitions>
@@ -27,7 +27,8 @@
         <!-- Логин -->
         <StackPanel Orientation="Vertical" Grid.Row="1" Margin="0,0,0,10">
             <TextBlock Text="Логин:" Foreground="#D0D0FF"/>
-            <TextBox Text="{Binding Login, UpdateSourceTrigger=PropertyChanged}" 
+            <TextBox x:Name="LoginTextBox"
+                     Text="{Binding Login, UpdateSourceTrigger=PropertyChanged}" 
                      Height="28" Background="#2A2F45" Foreground="White" 
                      BorderBrush="#4A5F99" Padding="5"/>
         </StackPanel>
@@ -47,7 +48,6 @@
         <Button Content="Войти" Width="120" Height="32" Grid.Row="4"
                 HorizontalAlignment="Center" VerticalAlignment="Top"
                 Background="#4A5F99" Foreground="White" BorderThickness="0"
-                Command="{Binding LoginCommand}"
-                CommandParameter="{Binding ElementName=PasswordBox, Path=Password}"/>
+                Click="LoginButton_Click"/>
     </Grid>
 </Window>

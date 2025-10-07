@@ -1,9 +1,11 @@
-﻿using Launcher.ServiceLib;
+﻿using Dapper;
+using Launcher.ServiceLib;
 using Launcher.ServiceLib.Contracts;
 using Launcher.ServiceLib.Data;
 using System;
 using System.ServiceModel;
 using System.ServiceModel.Description;
+using static Launcher.ServiceLib.Data.DbManager;
 
 namespace Launcher.Host
 {
@@ -248,6 +250,22 @@ namespace Launcher.Host
             }
             Console.ResetColor();
             Console.ReadLine();
+        }
+        public AdminData AuthenticateAdmin(string login, string password)
+        {
+            Console.WriteLine($"[SERVER] Попытка входа: Login='{login}', Password='{password}'");
+
+            using var db = Database.GetOpenConnection();
+            var admin = db.QueryFirstOrDefault<AdminData>(
+                "SELECT id, login AS LoginAdmin, password AS PasswordAdmin, rang AS Rang FROM admins WHERE login=@login AND password=@password",
+                new { login, password });
+
+            if (admin != null)
+                Console.WriteLine($"[SERVER] Успешный вход: {admin.LoginAdmin} (Rang={admin.Rang})");
+            else
+                Console.WriteLine($"[SERVER] Неудачный вход для логина '{login}'");
+
+            return admin;
         }
 
         private static void StopWcfService()

@@ -23,6 +23,12 @@ namespace Admin
         public MainWindowLead()
         {
             InitializeComponent();
+
+            // Передаем DataGrid в ViewModel для динамических колонок
+            if (DataContext is ViewModelsAdmin.MainViewLeadModel vm)
+            {
+                vm.SetDataGrid(CharactersDataGrid);
+            }
         }
     }
 }

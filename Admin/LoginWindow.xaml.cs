@@ -20,10 +20,20 @@ namespace Admin
     /// </summary>
     public partial class LoginWindow : Window
     {
+        
         public LoginWindow()
         {
             InitializeComponent();
-            DataContext = new AdminLoginViewModel();
+            this.DataContext = new ViewModelsAdmin.AdminLoginViewModel();
+        }
+        private void LoginButton_Click(object sender, RoutedEventArgs e)
+        {
+            // Получаем ViewModel
+            if (DataContext is ViewModelsAdmin.AdminLoginViewModel vm)
+            {
+                string password = PasswordBox.Password; // Берем пароль напрямую из PasswordBox
+                vm.LoginCommand.Execute(password);
+            }
         }
     }
 }
